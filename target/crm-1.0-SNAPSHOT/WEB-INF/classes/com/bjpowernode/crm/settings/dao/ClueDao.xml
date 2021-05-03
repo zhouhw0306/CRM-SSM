@@ -1,0 +1,188 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.bjpowernode.crm.settings.dao.ClueDao">
+
+    <insert id="save">
+        insert into tbl_clue(
+            id,
+            fullname,
+            appellation,
+            owner,
+            company,
+            job,
+            email,
+            phone,
+            website,
+            mphone,
+            state,
+            source,
+            createBy,
+            createTime,
+            description,
+            contactSummary,
+            nextContactTime,
+            address
+        ) values(
+            #{id},
+            #{fullname},
+            #{appellation},
+            #{owner},
+            #{company},
+            #{job},
+            #{email},
+            #{phone},
+            #{website},
+            #{mphone},
+            #{state},
+            #{source},
+            #{createBy},
+            #{createTime},
+            #{description},
+            #{contactSummary},
+            #{nextContactTime},
+            #{address}
+        )
+    </insert>
+
+
+    <select id="getTotal" resultType="int">
+        select count(*) from tbl_clue
+    </select>
+
+    <select id="getClueList" resultType="Clue">
+        select * from tbl_clue limit #{skipCount},#{pageSize}
+    </select>
+
+    <select id="detail" resultType="Clue">
+        select
+
+        c.id,
+        c.fullname,
+        c.appellation,
+        u.name as owner,
+        c.company,
+        c.job,
+        c.email,
+        c.phone,
+        c.website,
+        c.mphone,
+        c.state,
+        c.source,
+        c.createBy,
+        c.createTime,
+        c.editBy,
+        c.editTime,
+        c.description,
+        c.contactSummary,
+        c.nextContactTime,
+        c.address
+
+        from tbl_clue c
+        join tbl_user u
+        on c.owner=u.id
+
+        where c.id=#{id}
+
+    </select>
+
+    <select id="getActivityListByClueId" resultType="Activity">
+
+        select
+
+        c.id as id,
+        a.name,
+        a.startDate,
+        a.endDate,
+        u.name as owner
+
+        from tbl_activity a
+        join tbl_user u
+        on a.owner=u.id
+        join tbl_clue_activity_relation c
+        on a.id=c.activityId
+
+        where c.clueId=#{clueid}
+
+    </select>
+
+    <delete id="unbund">
+
+        delete from tbl_clue_activity_relation
+
+        where id=#{id}
+
+    </delete>
+
+    <select id="getActivityListByNameAndNotByClueId" resultType="Activity">
+
+        select
+
+        a.id,
+        a.name,
+        a.startDate,
+        a.endDate,
+        u.name as owner
+
+        from tbl_activity a
+        join tbl_user u
+        on a.owner=u.id
+
+        where a.name like '%' #{aname} '%'
+        and a.id not in(
+
+            select activityId from tbl_clue_activity_relation
+            where clueId=#{clueId}
+        )
+
+
+    </select>
+
+    <select id="getActivityListByName" resultType="Activity">
+
+        select
+
+        a.id,
+        a.name,
+        a.startDate,
+        a.endDate,
+        u.name as owner
+
+        from tbl_activity a
+        join tbl_user u
+        on a.owner=u.id
+
+        where a.name like '%' #{aname} '%'
+
+    </select>
+
+
+    <sql id="cluesql">select
+                   id,
+                   fullname,
+                   appellation,
+                   owner,
+                   company,
+                   job,
+                   email,
+                   phone,
+                   website,
+                   mphone,
+                   state,
+                   source,
+                   createBy,
+                   createTime,
+                   editBy,
+                   editTime,
+                   description,
+                   contactSummary,
+                   nextContactTim,
+                   address
+    </sql>
+
+    <select id="etById" resultType="Clue">
+        <include refid="cluesql"></include> from tbl_clue where id=#{id}
+    </select>
+
+</mapper>
