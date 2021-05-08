@@ -78,6 +78,7 @@ String basePath = request.getScheme()+"://"+request.getServerName()+":"+request.
 							html += '<td id="'+n.id+'">'+n.name+'</td>'
 							html += '<td>'+n.startDate+'</td>'
 							html += '<td>'+n.endDate+'</td>'
+
 							html += '<td>'+n.owner+'</td>'
 							html += '</tr>'
 
