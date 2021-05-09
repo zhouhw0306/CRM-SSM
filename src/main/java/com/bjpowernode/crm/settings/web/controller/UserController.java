@@ -73,7 +73,7 @@ public class UserController {
                 //登入成功
                 retMap.put("code",1);
                 session.setAttribute("sessionUser",user);
-
+                System.out.println("登录ip: "+request.getRemoteAddr());
                 // 如要要记住密码
                 if ("true".equals(isRemPwd)){
 
@@ -109,4 +109,14 @@ public class UserController {
     public String gzqu(){
         return "workbench/main/index";
     }
+
+
+    //退出登入
+    @RequestMapping("/pages/login.do")
+    public String exit(HttpSession session){
+
+        session.removeAttribute("sessionUser");
+        return "index";
+    }
+
 }

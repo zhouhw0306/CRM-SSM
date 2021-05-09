@@ -9,18 +9,12 @@ import com.bjpowernode.crm.utils.DateTimeUtil;
 import com.bjpowernode.crm.utils.UUIDUtil;
 import com.bjpowernode.crm.vo.PaginationVO;
 import com.bjpowernode.crm.workbench.domain.Activity;
-import javafx.concurrent.Worker;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.servlet.ModelAndView;
-
 import javax.annotation.Resource;
 import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-import javax.servlet.http.HttpSession;
-import java.io.IOException;
-import java.security.PublicKey;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -142,9 +136,9 @@ public class ClueController {
         return list;
     }
 
-
-//    @RequestMapping("/workbench/clue/convert.do")
-//    public void convert(String clueId, String flag, String money, String name, String expectedDate, String stage, String activityId, HttpSession session, HttpServletResponse response) throws IOException {
+//    //执行线索转换的操作，发出传统请求，请求结束后，最终响应回线索列表页
+//    @RequestMapping("/workbench/clue/convertzh.do")
+//    public ModelAndView convert(String clueId, String flag, String money, String name, String expectedDate, String stage, String activityId, HttpSession session){
 //
 //        Tran t = null;
 //
@@ -168,11 +162,43 @@ public class ClueController {
 //
 //        boolean flag1 = clueService.convert(clueId,t,createBy);
 //
-//        if (flag1){
-//            response.sendRedirect("/WEB-INF/pages/workbench/clue/index.jsp");
-//        }
+//        ModelAndView mv = new ModelAndView();
 //
+//        if (flag1){
+//            //response.sendRedirect("/WEB-INF/pages/workbench/clue/index.jsp");
+//            mv.setViewName("workbench/clue/index");
+//        }
+//        return mv;
 //
 //    }
+
+    //执行线索转换的操作，发出传统请求，请求结束后，最终响应回线索列表页
+    @RequestMapping("/workbench/clue/convertzh.do")
+    private ModelAndView convert(String flag, String clueId,HttpServletRequest request){
+        ModelAndView mv = new ModelAndView();
+
+        Tran tran = null;
+        String createBy = ((User) request.getSession().getAttribute("sessionUser")).getName();
+        //接收是否需要创建的标记
+        if ("a".equals(flag)){
+            tran = new Tran();
+            //接收交易表单中的参数
+            tran.setId(UUIDUtil.getUUID());
+            tran.setCreateTime(DateTimeUtil.getSysTime());
+            tran.setMoney(request.getParameter("money"));
+            tran.setName(request.getParameter("name"));
+            tran.setExpectedDate(request.getParameter("expectedDate"));
+            tran.setStage(request.getParameter("stage"));
+            tran.setActivityId(request.getParameter("activityId"));
+            tran.setCreateBy(createBy);
+        }
+        boolean returnFlag = clueService.convert(clueId,tran,createBy);
+        System.out.println("======="+returnFlag+"=======");
+        if (returnFlag){
+            mv.setViewName("workbench/clue/index");
+        }
+        return mv;
+
+    }
 
 }
